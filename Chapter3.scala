@@ -21,6 +21,17 @@ object List {
 		if (as.isEmpty) Nil
 		else Cons(as.head, apply(as.tail: _*))
 
+	def foldRight[A, B] (as: List[A], z:B)(f: (A, B) => B): B = as match {
+		case Nil => z
+		case Cons(x, xs) => f(x, foldRight(xs, z)(f))
+	}
+
+	def sum2 (ns: List[Int]) =
+		foldRight (ns, 0)((x, y) => x + y)
+
+	def product2 (ns: List[Double]) =
+		foldRight (ns, 1.0)(_ * _)
+
 	//excercise 3.2
 	def tail[A](x: List[A]) : List[A] = x match {
 		case Nil => Nil
@@ -50,6 +61,13 @@ object List {
 			if (f(h))
 				dropWhile(t,f)
 			else
-				t
+				Cons(h, t)
+	}
+
+	//excercise 3.6
+	def init[A] (l: List[A]): List[A] = l match {
+		case Nil => Nil
+		case Cons(h, Cons(h2,Nil)) => Cons(h, Nil)
+		case Cons(h, t) => Cons(h, init(t))
 	}
 }
