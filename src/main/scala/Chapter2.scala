@@ -50,6 +50,14 @@ object Chapter2 extends App {
     loop(0)
   }
 
+  def curry[A, B, C](f: (A, B) => C): A => B => C = a => b => f(a, b)
+
+  def uncurry[A, B, C](f: A => B => C): (A, B) => C = (a, b) => f(a)(b)
+
+  // the stdlib has a compose so this could be implemented as `f compose g`
+  // or `g andThen f`
+  def compose[A, B, C](f: B => C, g: A => B): A => C = a => f(g(a))
+
   println(fib(2))
   println(fib(3))
   println(fib2(2))
@@ -65,4 +73,6 @@ object Chapter2 extends App {
   assert(isSorted(a1, f1))
   assert(!isSorted(a2, f1))
   assert(isSorted(a3, f1))
+
+
 }
