@@ -1,7 +1,11 @@
+package chapter3
+
 //sealed trait means that all implementations of this trait (type/class/scalazfunzstuffzz) are included in this file.
 sealed trait List[+A]
-case object Nil extends List[Nothing]
+
 case class Cons[+A](head: A, tail: List[A]) extends List[A]
+
+case object Nil extends List[Nothing]
 
 object List {
   def sum(ints: List[Int]): Int = ints match {
@@ -147,4 +151,43 @@ object List {
   // 3.20
   def flatMap[A, B](as: List[A])(f: A => List[B]): List[B] = flatten(map(as)(f))
 
+  // 3.21
+  def filter2[A](as: List[A])(f: A => Boolean): List[A] = flatMap(as) { a =>
+    if (f(a))
+      Cons(a, Nil)
+    else
+      Nil
+  }
+
+  // 3.22
+  def add(l1: List[Int], l2: List[Int]): List[Int] = (l1, l2) match {
+    case (Nil, _)                     => Nil
+    case (_, Nil)                     => Nil
+    case (Cons(h1, t1), Cons(h2, t2)) => Cons(h1 + h2, add(t1, t2))
+  }
+
+  // 3.23
+  def zipWith[A, B, C](a: List[A], b: List[B])(f: (A, B) => C): List[C] =
+    (a, b) match {
+      case (Nil, _)                     => Nil
+      case (_, Nil)                     => Nil
+      case (Cons(h1, t1), Cons(h2, t2)) => Cons(f(h1, h2), zipWith(a, b)(f))
+    }
+
+  // 3.24
+  @annotation.tailrec
+  def startsWith[A](l: List[A], prefix: List[A]): Boolean = (l, prefix) match {
+    case (_, Nil)                              => true
+    case (Cons(h, t), Cons(h2, t2)) if h == h2 => startsWith(t, t2)
+    case _                                     => false
+  }
+
+  @annotation.tailrec
+  def hasSubsequence[A](l: List[A], sub: List[A]): Boolean = {
+    l match {
+      case Nil                              => false
+      case Cons(_, _) if startsWith(l, sub) => true
+      case Cons(_, t)                       => hasSubsequence(t, sub)
+    }
+  }
 }

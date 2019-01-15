@@ -41,7 +41,7 @@ object Chapter2 extends App {
       if (as.length == 0 || n == as.length - 1)
         true
       else {
-        if (ordered(as(n), as(n+1)))
+        if (ordered(as(n), as(n + 1)))
           loop(n + 1)
         else
           false
@@ -73,6 +73,5 @@ object Chapter2 extends App {
   assert(isSorted(a1, f1))
   assert(!isSorted(a2, f1))
   assert(isSorted(a3, f1))
-
 
 }
