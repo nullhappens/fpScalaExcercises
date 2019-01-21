@@ -54,6 +54,13 @@ object Option {
   def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] =
     a.flatMap(av => b.map(bv => f(av, bv)))
 
+  // Written with for comprehensions
+  def map2_1[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] =
+    for {
+      aa <- a
+      bb <- b
+    } yield f(aa, bb)
+
   // 4.4
   def sequence[A](as: List[Option[A]]): Option[List[A]] = as match {
     case Nil    => Some(Nil)
