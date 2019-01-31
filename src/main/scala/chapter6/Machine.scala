@@ -20,8 +20,19 @@ object CandyMachine {
         Machine(locked = true, candy - 1, coin)
     }
 
+  // exactly the same as update
+  def update2(i: Input)(m: Machine): Machine = (i, m) match {
+    case (_, Machine(_, 0, _)) => m
+    case (Coin, Machine(false, _, _)) => m
+    case (Turn, Machine(true, _, _)) => m
+    case (Coin, Machine(true, candy, coin)) =>
+      Machine(locked = false, candy, coin + 1)
+    case (Turn, Machine(false, candy, coin)) =>
+      Machine(locked = true, candy - 1, coin)
+  }
+
   def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = for {
-    _ <- State.sequence(inputs map (State.modify[Machine] _ compose update))
+    _ <- State.sequence(inputs map (State.modify[Machine] _ compose update2))
     s <- State.get
   } yield (s.coins, s.candies)
 }
