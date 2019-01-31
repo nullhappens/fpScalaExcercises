@@ -97,9 +97,31 @@ object RNG {
 
   // 6.7
   def sequence[A](as: List[Rand[A]]): Rand[List[A]] =
-    as.foldRight(unit(List.empty[A]))( (r, acc) => map2(r, acc)(_ :: _))
+    as.foldRight(unit(List.empty[A]))((r, acc) => map2(r, acc)(_ :: _))
 
   def _ints(count: Int): Rand[List[Int]] = sequence(List.fill(count)(int))
 
-  
+  // 6.8
+  def flatMap[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B] =
+    rng => {
+      val (a, r1) = f(rng)
+      g(a)(r1)
+    }
+
+  def nonNegativeLessThan(n: Int): Rand[Int] = flatMap(nonNegativeInt) { i =>
+    val mod = i % n
+    if (i + (n - 1) - mod >= 0) unit(mod)
+    else nonNegativeLessThan(n)
+  }
+
+  // 6.9
+  def mapViaFlatMap[A, B](s: Rand[A])(f: A => B): Rand[B] =
+    flatMap(s)(a => unit(f(a)))
+
+  def map2viaFlatMap[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+    flatMap(ra) { a =>
+      map(rb) { b =>
+        f(a, b)
+      }
+    }
 }
