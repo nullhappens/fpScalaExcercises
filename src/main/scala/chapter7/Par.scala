@@ -1,6 +1,6 @@
 package chapter7
 
-import java.util.concurrent.{Callable, ExecutorService, Future, TimeUnit}
+import java.util.concurrent._
 
 object Par{
   type Par[A] = ExecutorService => Future[A]
