@@ -15,7 +15,7 @@ val compilerFlags = Seq(
 
 // Common settings
 ThisBuild / version := "0.1.0"
-ThisBuild / scalaVersion := "2.12.7"
+ThisBuild / scalaVersion := "2.12.8"
 ThisBuild / autoCompilerPlugins := true
 ThisBuild / scalacOptions ++= compilerFlags
 ThisBuild / scalafmtOnCompile := true

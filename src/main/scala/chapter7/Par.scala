@@ -2,7 +2,7 @@ package chapter7
 
 import java.util.concurrent._
 
-object Par{
+object Par {
   type Par[A] = ExecutorService => Future[A]
 
   def unit[A](a: A): Par[A] = (es: ExecutorService) => UnitFuture(a)
@@ -17,25 +17,28 @@ object Par{
     override def get(timeout: Long, unit: TimeUnit): A = get
   }
 
-  def map2[A, B, C](a: Par[A])(b: Par[B])(f: (A, B) => C): Par[C] = (es: ExecutorService) => {
-    val aa = a(es)
-    val bb = b(es)
-    UnitFuture(f(aa.get(), bb.get()))  // Danger: does not respect timeouts
-  }
+  def map2[A, B, C](a: Par[A])(b: Par[B])(f: (A, B) => C): Par[C] =
+    (es: ExecutorService) => {
+      val aa = a(es)
+      val bb = b(es)
+      UnitFuture(f(aa.get(), bb.get())) // Danger: does not respect timeouts
+    }
 
   def map[A, B](pa: Par[A])(f: A => B): Par[B] =
     map2(pa)(unit(()))((a, _) => f(a))
 
-  def fork[A](a: Par[A]): Par[A] = es => es.submit(new Callable[A] {
-    def call: A = a(es).get()  // deadlocks for fixed size thread pools
-  })
+  def fork[A](a: Par[A]): Par[A] =
+    es =>
+      es.submit(new Callable[A] {
+        def call: A = a(es).get() // deadlocks for fixed size thread pools
+      })
 
   // 7.4
   def asyncF[A, B](f: A => B): A => Par[B] = a => fork(unit(f(a)))
 
   // 7.5
   def sequence[A](l: List[Par[A]]): Par[List[A]] =
-    l.foldRight[Par[List[A]]](unit(List()))((h,t) => map2(h)(t)(_ :: _))
+    l.foldRight[Par[List[A]]](unit(List()))((h, t) => map2(h)(t)(_ :: _))
 
   def parMap[A, B](ps: List[A])(f: A => B): Par[List[B]] = fork {
     val fbs = ps.map(asyncF(f))

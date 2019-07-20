@@ -26,6 +26,7 @@ sealed trait Stream[+A] {
           case Cons(_, t) => loop(i - 1, t())
           case Empty      => Stream.empty
         }
+
     loop(n, this)
   }
 
@@ -94,9 +95,16 @@ sealed trait Stream[+A] {
       val b2 = f(a, p1._1)
       (b2, Stream.cons(b2, p1._2))
     })._2
+
+  @annotation.tailrec
+  final def find(f: A => Boolean): Option[A] = this match {
+    case Empty      => None
+    case Cons(h, t) => if (f(h())) Some(h()) else t().find(f)
+  }
 }
 
 case object Empty extends Stream[Nothing]
+
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
 
 object Stream {
@@ -122,6 +130,7 @@ object Stream {
   def fibs(): Stream[Int] = {
     def loop(f0: Int, f1: Int): Stream[Int] =
       cons(f0, loop(f1, f0 + f1))
+
     loop(0, 1)
   }
 
