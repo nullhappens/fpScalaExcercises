@@ -29,5 +29,5 @@ trait Parsers[ParseError, Parser[+_]] { self =>
     def or[B >: A](p2: => Parser[B]): Parser[B] = self.or(p, p2)
 
   }
-  
+
 }
